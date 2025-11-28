@@ -69,7 +69,7 @@ class Category:
     def add_product(self, product: Product) -> None:
         self.__products.append(product)
         Category.total_products += 1  # Увеличиваем при добавлении
-        logger.info("добавили продукт")
+        logger.info("добавляем новый продукт")
 
     def remove_product(self, product: Product) -> None:
         if product in self.__products:
