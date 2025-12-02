@@ -1,4 +1,3 @@
-
 from loguru import logger
 import sys
 import os
@@ -9,19 +8,17 @@ logger.remove()
 
 # Настраиваем вывод в консоль (только INFO и выше)
 logger.add(
-    sys.stderr,
-    level="INFO",
-    format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level}</level> | {message}"
+    sys.stderr, level="INFO", format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level}</level> | {message}"
 )
 
 # Настраиваем запись в файл с ротацией и сжатием
 logger.add(
     "../logs/category.log",
-    level="INFO",           # Только INFO и выше
-    rotation="10 MB",       # Ротация при достижении 10 МБ
-    retention="1 month",     # Удаление логов старше 1 месяца
-    compression="gz",      # Сжатие старых логов
-    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"  # Формат файла
+    level="INFO",  # Только INFO и выше
+    rotation="10 MB",  # Ротация при достижении 10 МБ
+    retention="1 month",  # Удаление логов старше 1 месяца
+    compression="gz",  # Сжатие старых логов
+    format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",  # Формат файла
 )
 
 # Примеры сообщений
@@ -29,6 +26,85 @@ logger.debug("Это сообщение не появится (уровень DE
 logger.info("Это сообщение появится в консоли и файле")
 logger.warning("Это предупреждение также будет записано")
 
+
+
+
+# class Product:
+#     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+#         """
+#         Класс товара.
+#
+#         Args:
+#             name: Название товара (строка)
+#             description: Описание товара (строка)
+#             price: Цена товара в рублях (число с плавающей точкой)
+#             quantity: Количество в наличии в штуках (целое число)
+#         """
+#
+#         self.name = name
+#         self.description = description
+#         self.__price = price
+#         self.quantity = quantity
+#
+#     def __str__(self):
+#         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт.\n"
+#
+#     def __repr__(self):
+#         return self.__str__()
+#
+#     @classmethod
+#     def new_product(cls, product_dict):
+#         """
+#         Создаёт экземпляр класса Product на основе словаря с данными.
+#
+#         Args:
+#             cls: Ссылка на класс (передаётся автоматически декоратором @classmethod)
+#             product_dict: Словарь с ключами 'name', 'description', 'price', 'quantity'
+#
+#         Returns:
+#             Product: Новый экземпляр класса Product
+#
+#         Raises:
+#             KeyError: Если в словаре отсутствуют обязательные ключи
+#             TypeError: Если типы данных не соответствуют ожидаемым
+#         """
+#         # Проверяем наличие всех обязательных ключей
+#         required_keys = ["name", "description", "price", "quantity"]
+#         for key in required_keys:
+#             if key not in product_dict:
+#                 raise KeyError(f"Словарь должен содержать ключ '{key}'")
+#
+#         # Проверяем типы данных
+#         if not isinstance(product_dict["name"], str):
+#             raise TypeError("name должен быть строкой")
+#         if not isinstance(product_dict["description"], str):
+#             raise TypeError("description должен быть строкой")
+#         if not isinstance(product_dict["price"], (int, float)):
+#             raise TypeError("price должен быть числом")
+#         if not isinstance(product_dict["quantity"], int):
+#             raise TypeError("quantity должен быть целым числом")
+#
+#         # Создаём экземпляр класса на основе данных словаря
+#         return cls(
+#             name=product_dict["name"],
+#             description=product_dict["description"],
+#             price=product_dict["price"],
+#             quantity=product_dict["quantity"],
+#         )
+#
+#     @property
+#     def price(self):
+#         return self.__price
+#
+#
+#     @price.setter
+#     def price(self, new_price):
+#         if new_price >= self.__price:
+#             self.__price = new_price
+#         else:
+#             self.__price = self.__price
+#             print("Цена не должна быть нулевая или отрицательная")
+#
 
 
 class Product:
@@ -44,43 +120,130 @@ class Product:
         """
         self.name = name
         self.description = description
-        self.price = price
+        self.__price = price
         self.quantity = quantity
 
-
     def __str__(self):
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт.\n"
-
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт.\n"
 
     def __repr__(self):
         return self.__str__()
 
+    @classmethod
+    def new_product(cls, product_dict: dict, products_list: list):
+        """
+        Создаёт экземпляр класса Product на основе словаря с данными.
+        Если товар с таким именем уже есть в списке, объединяет количество и выбирает максимальную цену.
+
+        Args:
+            cls: Ссылка на класс (передаётся автоматически декоратором @classmethod)
+            product_dict: Словарь с ключами 'name', 'description', 'price', 'quantity'
+            products_list: Список существующих товаров для поиска дубликатов (опционально)
+
+        Returns:
+            Product: Новый или обновлённый экземпляр класса Product
+
+        Raises:
+            KeyError: Если в словаре отсутствуют обязательные ключи
+            TypeError: Если типы данных не соответствуют ожидаемым
+        """
+        # Проверяем наличие всех обязательных ключей
+        required_keys = ['name', 'description', 'price', 'quantity']
+        for key in required_keys:
+            if key not in product_dict:
+                raise KeyError(f"Словарь должен содержать ключ '{key}'")
+
+        # Проверяем типы данных
+        if not isinstance(product_dict['name'], str):
+            raise TypeError("name должен быть строкой")
+        if not isinstance(product_dict['description'], str):
+            raise TypeError("description должен быть строкой")
+        if not isinstance(product_dict['price'], (int, float)):
+            raise TypeError("price должен быть числом")
+        if not isinstance(product_dict['quantity'], int):
+            raise TypeError("quantity должен быть целым числом")
+
+        name = product_dict['name']
+
+        # Если список товаров не передан или пуст — просто создаём новый товар
+        if not products_list:
+            return cls(
+                name=name,
+                description=product_dict['description'],
+                price=product_dict['price'],
+                quantity=product_dict['quantity']
+            )
+
+        # Ищем товар с таким же именем в списке
+        existing_product = None
+        for product in products_list:
+            if product.name == name:
+                existing_product = product
+                break
+
+        if existing_product:
+            # Объединяем количество
+            new_quantity = existing_product.quantity + product_dict['quantity']
+            # Выбираем максимальную цену
+            new_price = max(existing_product.__price, product_dict['price'])
+            # Обновляем существующий товар
+            existing_product.quantity = new_quantity
+            existing_product.__price = new_price
+            # Обновляем описание (можно оставить старое или взять новое — здесь берём новое)
+            existing_product.description = product_dict['description']
+            return existing_product
+        else:
+            # Товара с таким именем нет — создаём новый
+            return cls(
+                name=name,
+                description=product_dict['description'],
+                price=product_dict['price'],
+                quantity=product_dict['quantity']
+            )
+
+    @property
+    def price(self):
+        return self.__price
+
+    @price.setter
+    def price(self, new_price):
+        if new_price >= 0:
+            print("Цена не должна быть нулевая или отрицательная"
+                  )
+            return
+        self.price = new_price
+
 
 class Category:
-    total_categories = 0
-    total_products = 0
+    category_count = 0
+    product_count = 0
 
     def __init__(self, name: str, description: str, products: list[Product]) -> None:
+
+
         self.name = name
         self.description = description
         self.__products = products
-        Category.total_categories += 1
+        Category.category_count += 1
 
     def add_product(self, product: Product) -> None:
         self.__products.append(product)
-        Category.total_products += 1  # Увеличиваем при добавлении
+        Category.product_count += 1  # Увеличиваем при добавлении
         logger.info("добавляем новый продукт")
 
     def remove_product(self, product: Product) -> None:
         if product in self.__products:
             self.__products.remove(product)
-            Category.total_products -= 1  # Уменьшаем при удалении!
+            Category.product_count -= 1  # Уменьшаем при удалении!
         # Если товара нет — ничего не делаем (без ошибки)
-
 
     @property
     def products(self):
-        return self.__products
+        products_str = ""
+        for prod in self.__products:
+            products_str += f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n"
+        return products_str
+
 
 if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -102,28 +265,29 @@ if __name__ == "__main__":
     print(product3.price)
     print(product3.quantity)
 
-    category1 = Category("Смартфоны",
-                         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-                         [product1, product2, product3])
+    category1 = Category(
+        "Смартфоны",
+        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+        [product1, product2, product3],
+    )
 
     print(category1.name == "Смартфоны")
     print(category1.description)
+    print(len(category1.products))
+    print(category1.category_count)
+    print(category1.product_count)
 
-    print(category1.total_categories)
-    print(category1.total_products)
-
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category2 = Category("Телевизоры",
-                         "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-                         [product4])
+    product4 = Product('55" QLED 4K', "Фоновая подсветка",  123000.0, 7)
+    category2 = Category(
+        "Телевизоры",
+        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+        [product4],
+    )
 
     print(category2.name)
     print(category2.description)
     print(len(category2.products))
     print(category2.products)
 
-    print(Category.total_categories)
-    print(Category.total_products)
-
-
-
+    print(Category.category_count)
+    print(Category.product_count)

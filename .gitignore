@@ -216,7 +216,7 @@ poetry.lock
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-
+.idea
 # Streamlit
 .streamlit/secrets.toml
 .idea/. i d e a
