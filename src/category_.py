@@ -1,7 +1,9 @@
-from loguru import logger
-import sys
+import json
 import os
+import sys
 import typing
+
+from loguru import logger
 
 # Удаляем стандартные обработчики
 logger.remove()
@@ -27,84 +29,8 @@ logger.info("Это сообщение появится в консоли и ф�
 logger.warning("Это предупреждение также будет записано")
 
 
-
-
-# class Product:
-#     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-#         """
-#         Класс товара.
-#
-#         Args:
-#             name: Название товара (строка)
-#             description: Описание товара (строка)
-#             price: Цена товара в рублях (число с плавающей точкой)
-#             quantity: Количество в наличии в штуках (целое число)
-#         """
-#
-#         self.name = name
-#         self.description = description
-#         self.__price = price
-#         self.quantity = quantity
-#
-#     def __str__(self):
-#         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт.\n"
-#
-#     def __repr__(self):
-#         return self.__str__()
-#
-#     @classmethod
-#     def new_product(cls, product_dict):
-#         """
-#         Создаёт экземпляр класса Product на основе словаря с данными.
-#
-#         Args:
-#             cls: Ссылка на класс (передаётся автоматически декоратором @classmethod)
-#             product_dict: Словарь с ключами 'name', 'description', 'price', 'quantity'
-#
-#         Returns:
-#             Product: Новый экземпляр класса Product
-#
-#         Raises:
-#             KeyError: Если в словаре отсутствуют обязательные ключи
-#             TypeError: Если типы данных не соответствуют ожидаемым
-#         """
-#         # Проверяем наличие всех обязательных ключей
-#         required_keys = ["name", "description", "price", "quantity"]
-#         for key in required_keys:
-#             if key not in product_dict:
-#                 raise KeyError(f"Словарь должен содержать ключ '{key}'")
-#
-#         # Проверяем типы данных
-#         if not isinstance(product_dict["name"], str):
-#             raise TypeError("name должен быть строкой")
-#         if not isinstance(product_dict["description"], str):
-#             raise TypeError("description должен быть строкой")
-#         if not isinstance(product_dict["price"], (int, float)):
-#             raise TypeError("price должен быть числом")
-#         if not isinstance(product_dict["quantity"], int):
-#             raise TypeError("quantity должен быть целым числом")
-#
-#         # Создаём экземпляр класса на основе данных словаря
-#         return cls(
-#             name=product_dict["name"],
-#             description=product_dict["description"],
-#             price=product_dict["price"],
-#             quantity=product_dict["quantity"],
-#         )
-#
-#     @property
-#     def price(self):
-#         return self.__price
-#
-#
-#     @price.setter
-#     def price(self, new_price):
-#         if new_price >= self.__price:
-#             self.__price = new_price
-#         else:
-#             self.__price = self.__price
-#             print("Цена не должна быть нулевая или отрицательная")
-#
+# with open('products.json', 'r', encoding='utf-8') as f:
+#     datas = json.load(f)
 
 
 class Product:
@@ -148,30 +74,30 @@ class Product:
             TypeError: Если типы данных не соответствуют ожидаемым
         """
         # Проверяем наличие всех обязательных ключей
-        required_keys = ['name', 'description', 'price', 'quantity']
+        required_keys = ["name", "description", "price", "quantity"]
         for key in required_keys:
             if key not in product_dict:
                 raise KeyError(f"Словарь должен содержать ключ '{key}'")
 
         # Проверяем типы данных
-        if not isinstance(product_dict['name'], str):
+        if not isinstance(product_dict["name"], str):
             raise TypeError("name должен быть строкой")
-        if not isinstance(product_dict['description'], str):
+        if not isinstance(product_dict["description"], str):
             raise TypeError("description должен быть строкой")
-        if not isinstance(product_dict['price'], (int, float)):
+        if not isinstance(product_dict["price"], (int, float)):
             raise TypeError("price должен быть числом")
-        if not isinstance(product_dict['quantity'], int):
+        if not isinstance(product_dict["quantity"], int):
             raise TypeError("quantity должен быть целым числом")
 
-        name = product_dict['name']
+        name = product_dict["name"]
 
         # Если список товаров не передан или пуст — просто создаём новый товар
         if not products_list:
             return cls(
                 name=name,
-                description=product_dict['description'],
-                price=product_dict['price'],
-                quantity=product_dict['quantity']
+                description=product_dict["description"],
+                price=product_dict["price"],
+                quantity=product_dict["quantity"],
             )
 
         # Ищем товар с таким же именем в списке
@@ -183,22 +109,22 @@ class Product:
 
         if existing_product:
             # Объединяем количество
-            new_quantity = existing_product.quantity + product_dict['quantity']
+            new_quantity = existing_product.quantity + product_dict["quantity"]
             # Выбираем максимальную цену
-            new_price = max(existing_product.__price, product_dict['price'])
+            new_price = max(existing_product.__price, product_dict["price"])
             # Обновляем существующий товар
             existing_product.quantity = new_quantity
             existing_product.__price = new_price
             # Обновляем описание (можно оставить старое или взять новое — здесь берём новое)
-            existing_product.description = product_dict['description']
+            existing_product.description = product_dict["description"]
             return existing_product
         else:
             # Товара с таким именем нет — создаём новый
             return cls(
                 name=name,
-                description=product_dict['description'],
-                price=product_dict['price'],
-                quantity=product_dict['quantity']
+                description=product_dict["description"],
+                price=product_dict["price"],
+                quantity=product_dict["quantity"],
             )
 
     @property
@@ -208,8 +134,7 @@ class Product:
     @price.setter
     def price(self, new_price):
         if new_price >= 0:
-            print("Цена не должна быть нулевая или отрицательная"
-                  )
+            print("Цена не должна быть нулевая или отрицательная")
             return
         self.price = new_price
 
@@ -220,14 +145,14 @@ class Category:
 
     def __init__(self, name: str, description: str, products: list[Product]) -> None:
 
-
         self.name = name
         self.description = description
         self.__products = products
         Category.category_count += 1
+        Category.product_count = len("products")
 
-    def add_product(self, product: Product) -> None:
-        self.__products.append(product)
+    def add_product(self, name: Product) -> None:
+        self.__products.append(name)
         Category.product_count += 1  # Увеличиваем при добавлении
         logger.info("добавляем новый продукт")
 
@@ -277,7 +202,7 @@ if __name__ == "__main__":
     print(category1.category_count)
     print(category1.product_count)
 
-    product4 = Product('55" QLED 4K', "Фоновая подсветка",  123000.0, 7)
+    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
     category2 = Category(
         "Телевизоры",
         "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
