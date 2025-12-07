@@ -181,6 +181,8 @@ class Category:
             return True
         return False
 
+#        """ геттер """
+
     @property
     def products(self) -> str:
         """Строковое представление списка товаров."""
