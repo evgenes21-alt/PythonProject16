@@ -1,7 +1,4 @@
-import json
-import os
 import sys
-import typing
 
 from loguru import logger
 
@@ -27,10 +24,6 @@ logger.add(
 logger.debug("Это сообщение не появится (уровень DEBUG)")  # Не будет видно, т.к. уровень INFO
 logger.info("Это сообщение появится в консоли и файле")
 logger.warning("Это предупреждение также будет записано")
-
-
-# with open('products.json', 'r', encoding='utf-8') as f:
-#     datas = json.load(f)
 
 
 class Product:
@@ -144,30 +137,60 @@ class Category:
     product_count = 0
 
     def __init__(self, name: str, description: str, products: list[Product]) -> None:
-
         self.name = name
         self.description = description
-        self.__products = products
+        self.__products = products  # Сохраняем список товаров
+
+        # Увеличиваем счётчик категорий
         Category.category_count += 1
-        Category.product_count = len("products")
 
-    def add_product(self, name: Product) -> None:
-        self.__products.append(name)
-        Category.product_count += 1  # Увеличиваем при добавлении
-        logger.info("добавляем новый продукт")
+        # Автоматически считаем количество товаров в этой категории
+        self._product_count = len(self.__products)
 
-    def remove_product(self, product: Product) -> None:
+        # Добавляем к глобальному счётчику
+        Category.product_count += self._product_count
+
+    def get_product_count(self) -> int:
+        """Возвращает количество товаров в данной категории."""
+        return self._product_count
+
+    @classmethod
+    def get_total_product_count(cls) -> int:
+        """Возвращает общее количество товаров во всех категориях."""
+        return cls.product_count
+
+    @classmethod
+    def get_category_count(cls) -> int:
+        """Возвращает общее количество категорий."""
+        return cls.category_count
+
+    def add_product(self, product: Product) -> None:
+        """Добавляет товар в категорию."""
+        self.__products.append(product)
+        self._product_count += 1
+        Category.product_count += 1
+        logger.info("Добавляем новый продукт")
+
+    def remove_product(self, product: Product) -> bool:
+        """Удаляет товар из категории. Возвращает True при успехе."""
         if product in self.__products:
             self.__products.remove(product)
-            Category.product_count -= 1  # Уменьшаем при удалении!
-        # Если товара нет — ничего не делаем (без ошибки)
+            self._product_count -= 1
+            Category.product_count -= 1
+            logger.info("Удаляем продукт")
+            return True
+        return False
 
     @property
-    def products(self):
+    def products(self) -> str:
+        """Строковое представление списка товаров."""
+        if not self.__products:
+            return "Нет товаров"
+
         products_str = ""
         for prod in self.__products:
             products_str += f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n"
-        return products_str
+        return products_str.rstrip()
 
 
 if __name__ == "__main__":
