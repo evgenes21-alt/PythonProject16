@@ -133,8 +133,8 @@ class Product:
         self.price = new_price
 
     def __add__(self, other):
-        total_price = self.__price*other.__price
-        total_quantity = self.quantity*other.quantity
+        total_price = self.__price*self.quantity
+        total_quantity = other.__price*other.quantity
         total_sum = total_price + total_quantity
         return total_sum
 
