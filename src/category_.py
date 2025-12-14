@@ -120,6 +120,7 @@ class Product:
                 quantity=product_dict["quantity"],
             )
 
+
     @property
     def price(self):
         return self.__price
@@ -131,44 +132,52 @@ class Product:
             return
         self.price = new_price
 
+    def __add__(self, other):
+        total_price = self.__price*other.__price
+        total_quantity = self.quantity*other.quantity
+        total_sum = total_price + total_quantity
+        return total_sum
+
 
 class Category:
-    category_count = 0
-    product_count = 0
+    category_count = 0    #"Общее количество категорий"
+    product_count = 0     # Всего товаров во всех отделах
 
     def __init__(self, name: str, description: str, products: list[Product]) -> None:
-        self.name = name
-        self.description = description
-        self.__products = products  # Сохраняем список товаров
+        self.name = name   # Название отдела
+        self.description = description  # Описание
+        self.__products = products  # Сохраняем список товаров # Список товаров
 
         # Увеличиваем счётчик категорий
-        Category.category_count += 1
+        Category.category_count += 1   # +1 к общему числу отделов
 
         # Автоматически считаем количество товаров в этой категории
-        self._product_count = len(self.__products)
+        self._product_count = len(self.__products)    # Сколько товаров в этом отделе
 
         # Добавляем к глобальному счётчику
-        Category.product_count += self._product_count
+        Category.product_count += self._product_count  # + к общему числу товаров
+
+
 
     def get_product_count(self) -> int:
         """Возвращает количество товаров в данной категории."""
-        return self._product_count
+        return self._product_count  #Сколько у вас товаров сейчас?
 
     @classmethod
     def get_total_product_count(cls) -> int:
         """Возвращает общее количество товаров во всех категориях."""
-        return cls.product_count
+        return cls.product_count     #Всего товаров во всех отделах
 
     @classmethod
     def get_category_count(cls) -> int:
         """Возвращает общее количество категорий."""
-        return cls.category_count
+        return cls.category_count   #Всего отделов в магазине
 
     def add_product(self, product: Product) -> None:
         """Добавляет товар в категорию."""
-        self.__products.append(product)
-        self._product_count += 1
-        Category.product_count += 1
+        self.__products.append(product)  # Добавляем товар в список
+        self._product_count += 1         # +1 к счёту в отделе
+        Category.product_count += 1       # +1 к общему счёту
         logger.info("Добавляем новый продукт")
 
     def remove_product(self, product: Product) -> bool:
@@ -187,57 +196,87 @@ class Category:
     def products(self) -> str:
         """Строковое представление списка товаров."""
         if not self.__products:
-            return "Нет товаров"
+            return "Нет товаров"    # Формируем строку с перечнем
 
         products_str = ""
         for prod in self.__products:
             products_str += f"{prod.name}, {prod.price} руб. Остаток: {prod.quantity} шт.\n"
         return products_str.rstrip()
 
+    def __str__(self):
+        total_quantity = 0
+        for product in self.__products:
+            total_quantity += product.quantity
+        return f"{self.name}, количество продуктов {total_quantity} шт\n"
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
-    print(product1.name)
-    print(product1.description)
-    print(product1.price)
-    print(product1.quantity)
-
-    print(product2.name)
-    print(product2.description)
-    print(product2.price)
-    print(product2.quantity)
-
-    print(product3.name)
-    print(product3.description)
-    print(product3.price)
-    print(product3.quantity)
+    print(str(product1))
+    print(str(product2))
+    print(str(product3))
 
     category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-        [product1, product2, product3],
+        [product1, product2, product3]
     )
 
-    print(category1.name == "Смартфоны")
-    print(category1.description)
-    print(len(category1.products))
-    print(category1.category_count)
-    print(category1.product_count)
+    print(str(category1))
 
-    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
-    category2 = Category(
-        "Телевизоры",
-        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-        [product4],
-    )
+    print(category1.products)
 
-    print(category2.name)
-    print(category2.description)
-    print(len(category2.products))
-    print(category2.products)
+    print(product1 + product2)
+    print(product1 + product3)
+    print(product2 + product3)
 
-    print(Category.category_count)
-    print(Category.product_count)
+
+
+    # product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+    # product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    # product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    #
+    # print(product1.name)
+    # print(product1.description)
+    # print(product1.price)
+    # print(product1.quantity)
+    #
+    # print(product2.name)
+    # print(product2.description)
+    # print(product2.price)
+    # print(product2.quantity)
+    #
+    # print(product3.name)
+    # print(product3.description)
+    # print(product3.price)
+    # print(product3.quantity)
+    #
+    # category1 = Category(
+    #     "Смартфоны",
+    #     "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+    #     [product1, product2, product3],
+    # )
+    #
+    # print(category1.name == "Смартфоны")
+    # print(category1.description)
+    # print(len(category1.products))
+    # print(category1.category_count)
+    # print(category1.product_count)
+    #
+    # product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
+    # category2 = Category(
+    #     "Телевизоры",
+    #     "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+    #     [product4],
+    # )
+    #
+    # print(category2.name)
+    # print(category2.description)
+    # print(len(category2.products))
+    # print(category2.products)
+    #
+    # print(Category.category_count)
+    # print(Category.product_count)

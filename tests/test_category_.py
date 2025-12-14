@@ -161,7 +161,75 @@ class TestCategoryWithRealData(unittest.TestCase):
         another_category = Category("Ноутбуки", "Мобильные компьютеры", [])
         self.assertEqual(Category.category_count, 3)  # 2 было + 1 новая
 
+class TestProductAdd(unittest.TestCase):
 
+    def test_add_returns_correct_sum(self):
+        """Проверяет, что __add__ возвращает правильную сумму произведений."""
+        p1 = Product("Товар 1", "Описание 1", price=10.0, quantity=2)
+        p2 = Product("Товар 2", "Описание 2", price=5.0, quantity=3)
+
+        result = p1 + p2
+
+        # Ожидаемое: (10 * 5) + (2 * 3) = 50 + 6 = 56
+        expected = 56.0
+        self.assertEqual(result, expected)
+
+    def test_add_with_zero_values(self):
+        """Проверяет поведение при нулевых цене/количестве."""
+        p1 = Product("Товар 1", "Описание 1", price=0.0, quantity=5)
+        p2 = Product("Товар 2", "Описание 2", price=10.0, quantity=0)
+
+        result = p1 + p2
+
+        # Ожидаемое: (0 * 10) + (5 * 0) = 0 + 0 = 0
+        expected = 0.0
+        self.assertEqual(result, expected)
+
+    def test_add_with_negative_quantity(self):
+        """Проверяет работу с отрицательным количеством (если допустимо)."""
+        p1 = Product("Товар 1", "Описание 1", price=10.0, quantity=-2)
+        p2 = Product("Товар 2", "Описание 2", price=5.0, quantity=3)
+
+        result = p1 + p2
+
+        # Ожидаемое: (10 * 5) + (-2 * 3) = 50 - 6 = 44
+        expected = 44.0
+        self.assertEqual(result, expected)
+
+class TestCategoryStr(unittest.TestCase):
+
+    def setUp(self):
+        """Создаём тестовые данные перед каждым тестом."""
+        self.p1 = Product("iPhone", "Смартфон", 99990.0, 5)
+        self.p2 = Product("Samsung", "Смартфон", 89990.0, 3)
+        self.category = Category("Смартфоны", "Мобильные устройства", [self.p1, self.p2])
+
+    def test_str_returns_correct_format(self):
+        """Проверяет формат строки."""
+        result = str(self.category)
+        expected = "Смартфоны, количество продуктов 8 шт\n"  # 5 + 3 = 8
+        self.assertEqual(result, expected)
+
+    def test_str_with_empty_products_list(self):
+        """Проверяет строку для категории без товаров."""
+        empty_category = Category("Пустая категория", "Нет товаров", [])
+        result = str(empty_category)
+        expected = "Пустая категория, количество продуктов 0 шт\n"
+        self.assertEqual(result, expected)
+
+    def test_str_with_single_product(self):
+        """Проверяет строку для категории с одним товаром."""
+        single_product = Product("Ноутбук", "Игровой", 120000.0, 1)
+        category = Category("Ноутбуки", "Компьютеры", [single_product])
+        result = str(category)
+        expected = "Ноутбуки, количество продуктов 1 шт\n"
+        self.assertEqual(result, expected)
+
+    def test_str_calls_implicitly(self):
+        """Проверяет, что str() и print() используют __str__."""
+        result_str = str(self.category)
+        result_print = self.category.__str__()  # прямой вызов
+        self.assertEqual(result_str, result_print)
 
     if __name__ == '__main__':
         unittest.main()
