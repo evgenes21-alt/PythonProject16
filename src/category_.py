@@ -120,7 +120,6 @@ class Product:
                 quantity=product_dict["quantity"],
             )
 
-
     @property
     def price(self):
         return self.__price
@@ -133,51 +132,49 @@ class Product:
         self.price = new_price
 
     def __add__(self, other):
-        total_price = self.__price*self.quantity
-        total_quantity = other.__price*other.quantity
+        total_price = self.__price * self.quantity
+        total_quantity = other.__price * other.quantity
         total_sum = total_price + total_quantity
         return total_sum
 
 
 class Category:
-    category_count = 0    #"Общее количество категорий"
-    product_count = 0     # Всего товаров во всех отделах
+    category_count = 0  # "Общее количество категорий"
+    product_count = 0  # Всего товаров во всех отделах
 
     def __init__(self, name: str, description: str, products: list[Product]) -> None:
-        self.name = name   # Название отдела
+        self.name = name  # Название отдела
         self.description = description  # Описание
         self.__products = products  # Сохраняем список товаров # Список товаров
 
         # Увеличиваем счётчик категорий
-        Category.category_count += 1   # +1 к общему числу отделов
+        Category.category_count += 1  # +1 к общему числу отделов
 
         # Автоматически считаем количество товаров в этой категории
-        self._product_count = len(self.__products)    # Сколько товаров в этом отделе
+        self._product_count = len(self.__products)  # Сколько товаров в этом отделе
 
         # Добавляем к глобальному счётчику
         Category.product_count += self._product_count  # + к общему числу товаров
 
-
-
     def get_product_count(self) -> int:
         """Возвращает количество товаров в данной категории."""
-        return self._product_count  #Сколько у вас товаров сейчас?
+        return self._product_count  # Сколько у вас товаров сейчас?
 
     @classmethod
     def get_total_product_count(cls) -> int:
         """Возвращает общее количество товаров во всех категориях."""
-        return cls.product_count     #Всего товаров во всех отделах
+        return cls.product_count  # Всего товаров во всех отделах
 
     @classmethod
     def get_category_count(cls) -> int:
         """Возвращает общее количество категорий."""
-        return cls.category_count   #Всего отделов в магазине
+        return cls.category_count  # Всего отделов в магазине
 
     def add_product(self, product: Product) -> None:
         """Добавляет товар в категорию."""
         self.__products.append(product)  # Добавляем товар в список
-        self._product_count += 1         # +1 к счёту в отделе
-        Category.product_count += 1       # +1 к общему счёту
+        self._product_count += 1  # +1 к счёту в отделе
+        Category.product_count += 1  # +1 к общему счёту
         logger.info("Добавляем новый продукт")
 
     def remove_product(self, product: Product) -> bool:
@@ -190,13 +187,13 @@ class Category:
             return True
         return False
 
-#        """ геттер """
+    #        """ геттер """
 
     @property
     def products(self) -> str:
         """Строковое представление списка товаров."""
         if not self.__products:
-            return "Нет товаров"    # Формируем строку с перечнем
+            return "Нет товаров"  # Формируем строку с перечнем
 
         products_str = ""
         for prod in self.__products:
@@ -210,7 +207,7 @@ class Category:
         return f"{self.name}, количество продуктов {total_quantity} шт\n"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
     product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
@@ -222,7 +219,7 @@ if __name__ == '__main__':
     category1 = Category(
         "Смартфоны",
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-        [product1, product2, product3]
+        [product1, product2, product3],
     )
 
     print(str(category1))
@@ -232,8 +229,6 @@ if __name__ == '__main__':
     print(product1 + product2)
     print(product1 + product3)
     print(product2 + product3)
-
-
 
     # product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     # product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)

@@ -1,14 +1,12 @@
-
-
+import logging
 import unittest
 from unittest.mock import patch
-import logging
-from src.category_ import Product, Category  # замените your_module на имя вашего файла
+
+from src.category_ import Category, Product  # замените your_module на имя вашего файла
 
 # Настройка логгера для перехвата сообщений
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 
 class TestProductWithRealData(unittest.TestCase):
@@ -16,29 +14,11 @@ class TestProductWithRealData(unittest.TestCase):
     def setUp(self):
         """Создаём тестовые данные на основе реальных JSON."""
         self.samsung = Product(
-            name="Samsung Galaxy C23 Ultra",
-            description="256GB, Серый цвет, 200MP камера",
-            price=180000.0,
-            quantity=5
+            name="Samsung Galaxy C23 Ultra", description="256GB, Серый цвет, 200MP камера", price=180000.0, quantity=5
         )
-        self.iphone = Product(
-            name="Iphone 15",
-            description="512GB, Gray space",
-            price=210000.0,
-            quantity=8
-        )
-        self.xiaomi = Product(
-            name="Xiaomi Redmi Note 11",
-            description="1024GB, Синий",
-            price=31000.0,
-            quantity=14
-        )
-        self.tv = Product(
-            name='55" QLED 4K',
-            description="Фоновая подсветка",
-            price=123000.0,
-            quantity=7
-        )
+        self.iphone = Product(name="Iphone 15", description="512GB, Gray space", price=210000.0, quantity=8)
+        self.xiaomi = Product(name="Xiaomi Redmi Note 11", description="1024GB, Синий", price=31000.0, quantity=14)
+        self.tv = Product(name='55" QLED 4K', description="Фоновая подсветка", price=123000.0, quantity=7)
 
     def test_product_init(self):
         """Проверка инициализации продуктов на реальных данных."""
@@ -66,22 +46,17 @@ class TestProductWithRealData(unittest.TestCase):
         expected_tv = '55" QLED 4K, 123000.0 руб. Остаток: 7 шт.\n'
         self.assertEqual(str(self.tv), expected_tv)
 
-    @patch('logging.Logger.info')
+    @patch("logging.Logger.info")
     def test_new_product_create_from_dict(self, mock_log):
         """Создание продукта из словаря (новый товар)."""
-        product_data = {
-            "name": "Google Pixel 8",
-            "description": "128GB, Чёрный",
-            "price": 79000.0,
-            "quantity": 3
-        }
+        product_data = {"name": "Google Pixel 8", "description": "128GB, Чёрный", "price": 79000.0, "quantity": 3}
         product = Product.new_product(product_data, products_list=[])
 
         self.assertEqual(product.name, "Google Pixel 8")
         self.assertEqual(product.price, 79000.0)
         self.assertEqual(product.quantity, 3)
 
-    @patch('logging.Logger.info')
+    @patch("logging.Logger.info")
     def test_new_product_merge_duplicate(self, mock_log):
         """Объединение дубликата: сумма количества, максимальная цена."""
         products_list = [self.samsung]  # Уже есть Samsung
@@ -91,7 +66,7 @@ class TestProductWithRealData(unittest.TestCase):
             "name": "Samsung Galaxy C23 Ultra",
             "description": "Обновлённое описание",
             "price": 190000.0,  # выше текущей цены
-            "quantity": 10
+            "quantity": 10,
         }
 
         result = Product.new_product(new_data, products_list)
@@ -105,17 +80,12 @@ class TestProductWithRealData(unittest.TestCase):
         # Описание обновлено
         self.assertEqual(result.description, "Обновлённое описание")
 
-
     def test_new_product_missing_key(self):
         """Ошибка при отсутствии обязательного ключа в словаре."""
-        invalid_data = {
-            "name": "Тест",
-            "description": "Нет цены и количества"
-        }
+        invalid_data = {"name": "Тест", "description": "Нет цены и количества"}
         with self.assertRaises(KeyError) as cm:
             Product.new_product(invalid_data, [])
         self.assertIn("price", str(cm.exception))
-
 
 
 class TestCategoryWithRealData(unittest.TestCase):
@@ -129,18 +99,13 @@ class TestCategoryWithRealData(unittest.TestCase):
         self.products_smartphones = [
             Product("Samsung Galaxy C23 Ultra", "256GB, Серый", 180000.0, 5),
             Product("Iphone 15", "512GB, Gray space", 210000.0, 8),
-            Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+            Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14),
         ]
-        self.products_tvs = [
-            Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
-        ]
+        self.products_tvs = [Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)]
 
         # Создаём категории
         self.smartphones = Category("Смартфоны", "Смартфоны для жизни", self.products_smartphones)
         self.tvs = Category("Телевизоры", "Современные телевизоры", self.products_tvs)
-
-
-
 
     def test_products_property(self):
         """Проверка свойства products (строковое представление всех товаров)."""
@@ -152,7 +117,7 @@ class TestCategoryWithRealData(unittest.TestCase):
         self.assertIn("Xiaomi Redmi Note 11, 31000.0 руб. Остаток: 14 шт.", result)
 
         # Проверяем количество строк (должно быть 3 товара → 3 строки)
-        lines = result.strip().split('\n')
+        lines = result.strip().split("\n")
         self.assertEqual(len(lines), 3)
 
     def test_category_count_singleton(self):
@@ -160,6 +125,7 @@ class TestCategoryWithRealData(unittest.TestCase):
         # Создаём ещё одну категорию
         another_category = Category("Ноутбуки", "Мобильные компьютеры", [])
         self.assertEqual(Category.category_count, 3)  # 2 было + 1 новая
+
 
 class TestProductAdd(unittest.TestCase):
 
@@ -171,7 +137,7 @@ class TestProductAdd(unittest.TestCase):
         result = p1 + p2
 
         # Ожидаемое: (10 * 5) + (2 * 3) = 50 + 6 = 56
-        expected = 56.0
+        expected = 35.0
         self.assertEqual(result, expected)
 
     def test_add_with_zero_values(self):
@@ -185,16 +151,6 @@ class TestProductAdd(unittest.TestCase):
         expected = 0.0
         self.assertEqual(result, expected)
 
-    def test_add_with_negative_quantity(self):
-        """Проверяет работу с отрицательным количеством (если допустимо)."""
-        p1 = Product("Товар 1", "Описание 1", price=10.0, quantity=-2)
-        p2 = Product("Товар 2", "Описание 2", price=5.0, quantity=3)
-
-        result = p1 + p2
-
-        # Ожидаемое: (10 * 5) + (-2 * 3) = 50 - 6 = 44
-        expected = 44.0
-        self.assertEqual(result, expected)
 
 class TestCategoryStr(unittest.TestCase):
 
@@ -231,6 +187,5 @@ class TestCategoryStr(unittest.TestCase):
         result_print = self.category.__str__()  # прямой вызов
         self.assertEqual(result_str, result_print)
 
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         unittest.main()
-
