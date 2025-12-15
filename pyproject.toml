@@ -48,3 +48,6 @@ exclude = 'venv'
 [tool.isort]
 line_length = 119
 
+[tool.ruff]
+line-length = 119
+

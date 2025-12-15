@@ -1,6 +1,6 @@
 import pytest
 
-from src.category_ import Product, Category
+from src.category_ import Category, Product
 
 
 @pytest.fixture(scope="function")
