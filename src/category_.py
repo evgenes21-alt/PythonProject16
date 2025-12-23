@@ -132,10 +132,12 @@ class Product:
         self.price = new_price
 
     def __add__(self, other):
-        total_price = self.__price * self.quantity
-        total_quantity = other.__price * other.quantity
-        total_sum = total_price + total_quantity
-        return total_sum
+        if type(other) is Product:
+            total_price = self.__price * self.quantity
+            total_quantity = other.__price * other.quantity
+            total_sum = total_price + total_quantity
+            return total_sum
+        raise TypeError
 
 
 class Category:
@@ -170,8 +172,24 @@ class Category:
         """Возвращает общее количество категорий."""
         return cls.category_count  # Всего отделов в магазине
 
+    # def add_product(self, product: Product) -> None:
+    #     """Добавляет товар в категорию."""
+    #     if not isinstance(product,Product):
+    #         raise TypeError(f"Нельзя сложить Smartphone и {type(other)}")
+    #
+    #     self.__products.append(product)  # Добавляем товар в список
+    #     self._product_count += 1  # +1 к счёту в отделе
+    #     Category.product_count += 1  # +1 к общему счёту
+    #     logger.info("Добавляем новый продукт")
+
     def add_product(self, product: Product) -> None:
         """Добавляет товар в категорию."""
+        if not isinstance(product, Product):
+            raise TypeError(
+                f"Можно добавлять только объекты класса Product или его наследников. "
+                f"Получен: {type(product).__name__}"
+            )
+
         self.__products.append(product)  # Добавляем товар в список
         self._product_count += 1  # +1 к счёту в отделе
         Category.product_count += 1  # +1 к общему счёту
