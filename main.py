@@ -2,8 +2,8 @@
 
 # Импортируем классы
 from src.category_ import Product
-from src.Smartphone import Smartphone
-from src.LawnGrass import LawnGrass
+from src.smartphone import Smartphone
+from src.lawngrass import LawnGrass
 from src.category_ import Category
 
 # Если используете логирование, добавьте:

@@ -154,6 +154,10 @@ class TestProductAdd(unittest.TestCase):
 
 class TestCategoryStr(unittest.TestCase):
 
+    def __init__(self, methodName: str = "runTest"):
+        super().__init__(methodName)
+        self.samsung = None
+
     def setUp(self):
         """Создаём тестовые данные перед каждым тестом."""
         self.p1 = Product("iPhone", "Смартфон", 99990.0, 5)
@@ -187,5 +191,24 @@ class TestCategoryStr(unittest.TestCase):
         result_print = self.category.__str__()  # прямой вызов
         self.assertEqual(result_str, result_print)
 
-    if __name__ == "__main__":
-        unittest.main()
+    def test_product_price_setter(self):
+        """Проверка: изменение цены работает корректно."""
+        product = Product("Товар", "Описание", 100, 5)
+        product.price = 100
+        self.assertEqual(product.price, 100)
+
+    def test_product_quantity_setter(self):
+        """Проверка: изменение количества работает корректно."""
+        product = Product("Товар", "Описание", 100, 5)
+        product.quantity = 10
+        self.assertEqual(product.quantity, 10)
+
+    def test_product_inequality(self):
+        """Проверка: продукты с разными атрибутами не равны."""
+        p1 = Product("iPhone", "Смартфон", 100000, 2)
+        p2 = Product("Galaxy", "Смартфон", 90000, 3)
+        self.assertNotEqual(p1, p2)
+
+
+if __name__ == "__main__":
+    unittest.main()
