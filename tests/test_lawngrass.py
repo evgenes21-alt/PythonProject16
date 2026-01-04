@@ -70,11 +70,25 @@ class TestLawnGrass(unittest.TestCase):
 
         self.assertIn("Нельзя сложить LawnGrass и Product", str(context.exception))
 
-    def test_repr_and_str(self):
-        """Тест: строковое представление объекта."""
-        expected_str = "Мятлик луговой, 500 руб. Остаток: 20 шт.\n"
-        self.assertEqual(str(self.grass1), expected_str)
-        self.assertEqual(repr(self.grass1), expected_str)
+    # def test_repr_and_str(self):
+    #     """Тест: строковое представление объекта."""
+    #     expected_str = "Мятлик луговой, 500 руб. Остаток: 20 шт.\n"
+    #     self.assertEqual(str(self.grass1), expected_str)
+    #     self.assertEqual(repr(self.grass1), expected_str)
+    def test_str(self):
+        """Тест: str() должен возвращать удобное строковое представление."""
+        expected = "Мятлик луговой, 500 руб. Остаток: 20 шт.\n"
+        self.assertEqual(str(self.grass1), expected)
+
+    def test_repr(self):
+        """Тест: repr() должен возвращать детальное представление объекта."""
+        expected = (
+            "LawnGrass(name=Мятлик луговой, "
+            "description=Высококачественная газонная трава, "
+            "price=500, "
+            "quantity=20)"
+        )
+        self.assertEqual(repr(self.grass1), expected)
 
 
 if __name__ == "__main__":
