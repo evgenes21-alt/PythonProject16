@@ -2,7 +2,6 @@ import sys
 
 from loguru import logger
 
-
 from src.base_product import BaseProduct
 from src.mixin import PrintMixin
 
@@ -30,14 +29,13 @@ logger.info("Это сообщение появится в консоли и ф�
 logger.warning("Это предупреждение также будет записано")
 
 
-class Product(BaseProduct,PrintMixin):
+class Product(BaseProduct, PrintMixin):
     name: str
     description: str
     price: float
     quantity: int
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-
         """
         Класс товара.
 
@@ -47,7 +45,6 @@ class Product(BaseProduct,PrintMixin):
             price: Цена товара в рублях (число с плавающей точкой)
             quantity: Количество в наличии в штуках (целое число)
         """
-
 
         self.name = name
         self.description = description
@@ -62,12 +59,8 @@ class Product(BaseProduct,PrintMixin):
             print(f"Ошибка в repr(): {e}")
             return "<Неверный объект>"
 
-
-
     def __str__(self):
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт.\n"
-
-
 
     @classmethod
     def new_product(cls, product_dict: dict, products_list: list):
@@ -193,8 +186,6 @@ class Category:
         """Возвращает общее количество категорий."""
         return cls.category_count  # Всего отделов в магазине
 
-
-
     def add_product(self, product: Product) -> None:
         """Добавляет товар в категорию."""
         if not isinstance(product, Product):
@@ -238,7 +229,7 @@ class Category:
         return f"{self.name}, количество продуктов {total_quantity} шт\n"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(Product.__mro__)
 
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
@@ -260,9 +251,11 @@ if __name__ == '__main__':
     print(product3.price)
     print(product3.quantity)
 
-    category1 = Category("Смартфоны",
-                         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-                         [product1, product2, product3])
+    category1 = Category(
+        "Смартфоны",
+        "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
+        [product1, product2, product3],
+    )
 
     print(category1.name == "Смартфоны")
     print(category1.description)
@@ -270,10 +263,12 @@ if __name__ == '__main__':
     print(category1.category_count)
     print(category1.product_count)
 
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category2 = Category("Телевизоры",
-                         "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-                         [product4])
+    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
+    category2 = Category(
+        "Телевизоры",
+        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+        [product4],
+    )
 
     print(category2.name)
     print(category2.description)
@@ -282,7 +277,7 @@ if __name__ == '__main__':
 
     print(Category.category_count)
     print(Category.product_count)
-    product = Product('Ноутбук', 'Игровой ноутбук', 1500.0, 5)
+    product = Product("Ноутбук", "Игровой ноутбук", 1500.0, 5)
     print(product)
-    product = Product('Ноутбук', 'Игровой ноутбук', 1500.0, 5)
+    product = Product("Ноутбук", "Игровой ноутбук", 1500.0, 5)
     print(repr(product))

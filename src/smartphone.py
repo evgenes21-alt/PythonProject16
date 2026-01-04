@@ -23,17 +23,17 @@ class Smartphone(Product):
 
     def __add__(self, other):
         """
-           Складывает стоимость двух смартфонов (цена × количество).
+        Складывает стоимость двух смартфонов (цена × количество).
 
-           Args:
-               other (Smartphone): Второй смартфон для сложения.
+        Args:
+            other (Smartphone): Второй смартфон для сложения.
 
-           Returns:
-               float: Общая стоимость обоих смартфонов.
+        Returns:
+            float: Общая стоимость обоих смартфонов.
 
-           Raises:
-               TypeError: Если other не является экземпляром Smartphone.
-           """
+        Raises:
+            TypeError: Если other не является экземпляром Smartphone.
+        """
         if type(other) is not Smartphone:
             #        if not isinstance(other, Smartphone):
             raise TypeError(f"Нельзя сложить Smartphone и {type(other).__name__}")

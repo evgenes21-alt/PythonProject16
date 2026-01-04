@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+
 from src.category_ import Product
 from src.smartphone import Smartphone
 
