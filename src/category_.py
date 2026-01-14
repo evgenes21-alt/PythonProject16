@@ -2,6 +2,11 @@ import sys
 
 from loguru import logger
 
+from src.base_product import BaseProduct
+from src.mixin import PrintMixin
+from src.order import AbstractEntity
+from src.exception import ZeroOrderProduct
+
 # Удаляем стандартные обработчики
 logger.remove()
 
@@ -26,7 +31,12 @@ logger.info("Это сообщение появится в консоли и ф�
 logger.warning("Это предупреждение также будет записано")
 
 
-class Product:
+class Product(BaseProduct, PrintMixin):
+    name: str
+    description: str
+    price: float
+    quantity: int
+
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         """
         Класс товара.
@@ -37,16 +47,25 @@ class Product:
             price: Цена товара в рублях (число с плавающей точкой)
             quantity: Количество в наличии в штуках (целое число)
         """
+        if quantity <= 0:
+            raise ZeroOrderProduct("Товар с нулевым количеством не может быть добавлен")
+
+
         self.name = name
         self.description = description
         self.__price = price
         self.quantity = quantity
+        super().__init__()
+
+    def __repr__(self):
+        try:
+            return PrintMixin.__repr__(self)
+        except Exception as e:
+            print(f"Ошибка в repr(): {e}")
+            return "<Неверный объект>"
 
     def __str__(self):
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт.\n"
-
-    def __repr__(self):
-        return self.__str__()
 
     @classmethod
     def new_product(cls, product_dict: dict, products_list: list):
@@ -132,13 +151,20 @@ class Product:
         self.price = new_price
 
     def __add__(self, other):
-        total_price = self.__price * self.quantity
-        total_quantity = other.__price * other.quantity
-        total_sum = total_price + total_quantity
-        return total_sum
+        if type(other) is Product:
+            total_price = self.__price * self.quantity
+            total_quantity = other.__price * other.quantity
+            total_sum = total_price + total_quantity
+            return total_sum
+        raise TypeError
 
 
-class Category:
+
+
+
+class Category(AbstractEntity):
+
+    avg_price = 0
     category_count = 0  # "Общее количество категорий"
     product_count = 0  # Всего товаров во всех отделах
 
@@ -146,6 +172,7 @@ class Category:
         self.name = name  # Название отдела
         self.description = description  # Описание
         self.__products = products  # Сохраняем список товаров # Список товаров
+        super().__init__(name)
 
         # Увеличиваем счётчик категорий
         Category.category_count += 1  # +1 к общему числу отделов
@@ -155,6 +182,9 @@ class Category:
 
         # Добавляем к глобальному счётчику
         Category.product_count += self._product_count  # + к общему числу товаров
+
+    def info(self) -> str:
+        return f"Категория: {self.name}. Описание: {self.description}"
 
     def get_product_count(self) -> int:
         """Возвращает количество товаров в данной категории."""
@@ -172,6 +202,12 @@ class Category:
 
     def add_product(self, product: Product) -> None:
         """Добавляет товар в категорию."""
+        if not isinstance(product, Product):
+            raise TypeError(
+                f"Можно добавлять только объекты класса Product или его наследников. "
+                f"Получен: {type(product).__name__}"
+            )
+
         self.__products.append(product)  # Добавляем товар в список
         self._product_count += 1  # +1 к счёту в отделе
         Category.product_count += 1  # +1 к общему счёту
@@ -206,15 +242,43 @@ class Category:
             total_quantity += product.quantity
         return f"{self.name}, количество продуктов {total_quantity} шт\n"
 
+    def average_price(self) -> float:
+        try:
+            # Суммируем цены всех товаров
+            total_price: int = sum(product.price for product in self.__products)
+
+            # Рассчитываем среднее значение, деля сумму на количество товаров
+            avg_price = total_price / len(self.__products)
+            return round(avg_price, 2)  # Округлим до двух знаков после запятой
+
+        except ZeroDivisionError:
+            print("Если товаров нет, произойдет деление на ноль")
+            # Если товаров нет, произойдет деление на ноль
+            return 0.0
 
 if __name__ == "__main__":
+    print(Product.__mro__)
+
+
+
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    product3 = Product("X0iaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
-    print(str(product1))
-    print(str(product2))
-    print(str(product3))
+    print(product1.name)
+    print(product1.description)
+    print(product1.price)
+    print(product1.quantity)
+
+    print(product2.name)
+    print(product2.description)
+    print(product2.price)
+    print(product2.quantity)
+
+    print(product3.name)
+    print(product3.description)
+    print(product3.price)
+    print(product3.quantity)
 
     category1 = Category(
         "Смартфоны",
@@ -222,56 +286,30 @@ if __name__ == "__main__":
         [product1, product2, product3],
     )
 
-    print(str(category1))
+    print(category1.name == "Смартфоны")
+    print(category1.description)
+    print(len(category1.products))
+    print(category1.category_count)
+    print(category1.product_count)
 
-    print(category1.products)
+    product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
+    category2 = Category(
+        "Телевизоры",
+        "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+        [product4],
+    )
 
-    print(product1 + product2)
-    print(product1 + product3)
-    print(product2 + product3)
+    print(category2.name)
+    print(category2.description)
+    print(len(category2.products))
+    print(category2.products)
 
-    # product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
-    # product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    # product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
-    #
-    # print(product1.name)
-    # print(product1.description)
-    # print(product1.price)
-    # print(product1.quantity)
-    #
-    # print(product2.name)
-    # print(product2.description)
-    # print(product2.price)
-    # print(product2.quantity)
-    #
-    # print(product3.name)
-    # print(product3.description)
-    # print(product3.price)
-    # print(product3.quantity)
-    #
-    # category1 = Category(
-    #     "Смартфоны",
-    #     "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
-    #     [product1, product2, product3],
-    # )
-    #
-    # print(category1.name == "Смартфоны")
-    # print(category1.description)
-    # print(len(category1.products))
-    # print(category1.category_count)
-    # print(category1.product_count)
-    #
-    # product4 = Product('55" QLED 4K', "Фоновая подсветка", 123000.0, 7)
-    # category2 = Category(
-    #     "Телевизоры",
-    #     "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
-    #     [product4],
-    # )
-    #
-    # print(category2.name)
-    # print(category2.description)
-    # print(len(category2.products))
-    # print(category2.products)
-    #
-    # print(Category.category_count)
-    # print(Category.product_count)
+    print(Category.category_count)
+    print(Category.product_count)
+    product = Product("Ноутбук", "Игровой ноутбук", 1500.0, 5)
+    print(product)
+    product = Product("Ноутбук", "Игровой ноутбук", 1500.0, 5)
+    print(repr(product))
+    category = Category("Категории товаров", "", [product1, product2,product3,product4])
+    avg_price = category.average_price()
+    print(f"Средняя цена товаров в категории: {avg_price}")

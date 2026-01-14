@@ -2,7 +2,10 @@ import logging
 import unittest
 from unittest.mock import patch
 
-from src.category_ import Category, Product  # замените your_module на имя вашего файла
+from src.category_ import Category, Product
+import pytest
+from src.category_ import Product
+from src.exception import ZeroOrderProduct
 
 # Настройка логгера для перехвата сообщений
 logging.basicConfig(level=logging.INFO)
@@ -140,19 +143,23 @@ class TestProductAdd(unittest.TestCase):
         expected = 35.0
         self.assertEqual(result, expected)
 
+
     def test_add_with_zero_values(self):
-        """Проверяет поведение при нулевых цене/количестве."""
-        p1 = Product("Товар 1", "Описание 1", price=0.0, quantity=5)
-        p2 = Product("Товар 2", "Описание 2", price=10.0, quantity=0)
+        """Checks that ZeroOrderProduct is raised for zero quantity."""
+        p1 = Product("Product 1", "Description 1", price=0.0, quantity=5)
 
-        result = p1 + p2
+        with pytest.raises(ZeroOrderProduct) as exc_info:
+            p2 = Product("Product 2", "Description 2", price=10.0, quantity=0)
 
-        # Ожидаемое: (0 * 10) + (5 * 0) = 0 + 0 = 0
-        expected = 0.0
-        self.assertEqual(result, expected)
+        # Проверяем русское сообщение
+        assert "Товар с нулевым количеством не может быть добавлен" in str(exc_info.value)
 
 
 class TestCategoryStr(unittest.TestCase):
+
+    def __init__(self, methodName: str = "runTest"):
+        super().__init__(methodName)
+        self.samsung = None
 
     def setUp(self):
         """Создаём тестовые данные перед каждым тестом."""
@@ -187,5 +194,24 @@ class TestCategoryStr(unittest.TestCase):
         result_print = self.category.__str__()  # прямой вызов
         self.assertEqual(result_str, result_print)
 
-    if __name__ == "__main__":
-        unittest.main()
+    def test_product_price_setter(self):
+        """Проверка: изменение цены работает корректно."""
+        product = Product("Товар", "Описание", 100, 5)
+        product.price = 100
+        self.assertEqual(product.price, 100)
+
+    def test_product_quantity_setter(self):
+        """Проверка: изменение количества работает корректно."""
+        product = Product("Товар", "Описание", 100, 5)
+        product.quantity = 10
+        self.assertEqual(product.quantity, 10)
+
+    def test_product_inequality(self):
+        """Проверка: продукты с разными атрибутами не равны."""
+        p1 = Product("iPhone", "Смартфон", 100000, 2)
+        p2 = Product("Galaxy", "Смартфон", 90000, 3)
+        self.assertNotEqual(p1, p2)
+
+
+if __name__ == "__main__":
+    unittest.main()
