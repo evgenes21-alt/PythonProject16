@@ -35,7 +35,7 @@ class Smartphone(Product):
             TypeError: Если other не является экземпляром Smartphone.
         """
         if type(other) is not Smartphone:
-            #        if not isinstance(other, Smartphone):
+
             raise TypeError(f"Нельзя сложить Smartphone и {type(other).__name__}")
         return (self.price * self.quantity) + (other.price * other.quantity)
 

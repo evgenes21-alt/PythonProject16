@@ -4,6 +4,8 @@ from loguru import logger
 
 from src.base_product import BaseProduct
 from src.mixin import PrintMixin
+from src.order import AbstractEntity
+from src.exception import ZeroOrderProduct
 
 # Удаляем стандартные обработчики
 logger.remove()
@@ -45,6 +47,9 @@ class Product(BaseProduct, PrintMixin):
             price: Цена товара в рублях (число с плавающей точкой)
             quantity: Количество в наличии в штуках (целое число)
         """
+        if quantity <= 0:
+            raise ZeroOrderProduct("Товар с нулевым количеством не может быть добавлен")
+
 
         self.name = name
         self.description = description
@@ -154,7 +159,12 @@ class Product(BaseProduct, PrintMixin):
         raise TypeError
 
 
-class Category:
+
+
+
+class Category(AbstractEntity):
+
+    avg_price = 0
     category_count = 0  # "Общее количество категорий"
     product_count = 0  # Всего товаров во всех отделах
 
@@ -162,6 +172,7 @@ class Category:
         self.name = name  # Название отдела
         self.description = description  # Описание
         self.__products = products  # Сохраняем список товаров # Список товаров
+        super().__init__(name)
 
         # Увеличиваем счётчик категорий
         Category.category_count += 1  # +1 к общему числу отделов
@@ -171,6 +182,9 @@ class Category:
 
         # Добавляем к глобальному счётчику
         Category.product_count += self._product_count  # + к общему числу товаров
+
+    def info(self) -> str:
+        return f"Категория: {self.name}. Описание: {self.description}"
 
     def get_product_count(self) -> int:
         """Возвращает количество товаров в данной категории."""
@@ -228,13 +242,28 @@ class Category:
             total_quantity += product.quantity
         return f"{self.name}, количество продуктов {total_quantity} шт\n"
 
+    def average_price(self) -> float:
+        try:
+            # Суммируем цены всех товаров
+            total_price: int = sum(product.price for product in self.__products)
+
+            # Рассчитываем среднее значение, деля сумму на количество товаров
+            avg_price = total_price / len(self.__products)
+            return round(avg_price, 2)  # Округлим до двух знаков после запятой
+
+        except ZeroDivisionError:
+            print("Если товаров нет, произойдет деление на ноль")
+            # Если товаров нет, произойдет деление на ноль
+            return 0.0
 
 if __name__ == "__main__":
     print(Product.__mro__)
 
+
+
     product1 = Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
     product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
-    product3 = Product("Xiaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
+    product3 = Product("X0iaomi Redmi Note 11", "1024GB, Синий", 31000.0, 14)
 
     print(product1.name)
     print(product1.description)
@@ -281,3 +310,6 @@ if __name__ == "__main__":
     print(product)
     product = Product("Ноутбук", "Игровой ноутбук", 1500.0, 5)
     print(repr(product))
+    category = Category("Категории товаров", "", [product1, product2,product3,product4])
+    avg_price = category.average_price()
+    print(f"Средняя цена товаров в категории: {avg_price}")

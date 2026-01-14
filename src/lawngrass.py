@@ -10,7 +10,7 @@ class LawnGrass(Product):
 
     def __add__(self, other):
         if type(other) is not LawnGrass:
-            #        if not isinstance(other, LawnGrass):
+
             raise TypeError(f"Нельзя сложить LawnGrass и {type(other).__name__}")
         return (self.price * self.quantity) + (other.price * other.quantity)
 

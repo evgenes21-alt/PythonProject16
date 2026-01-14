@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import patch
 
+import pytest
+
 from src.category_ import Product
+from src.exception import ZeroOrderProduct
 from src.smartphone import Smartphone
 
 
@@ -37,10 +40,31 @@ class TestSmartphone(unittest.TestCase):
         phone = Smartphone("Тест", "Описание", 0, 5, 90.0, "Модель", 128, "Цвет")
         self.assertEqual(phone.price, 0)
 
+    # def test_init_zero_quantity(self):
+    #     """Тест: количество = 0."""
+    #     phone = Smartphone("Тест", "Описание", 1000, 0, 90.0, "Модель", 128, "Цвет")
+    #     self.assertEqual(phone.quantity, 0)
+    import pytest
+    from src.smartphone import Smartphone
+    from src.exception import ZeroOrderProduct
+
+
     def test_init_zero_quantity(self):
-        """Тест: количество = 0."""
-        phone = Smartphone("Тест", "Описание", 1000, 0, 90.0, "Модель", 128, "Цвет")
-        self.assertEqual(phone.quantity, 0)
+        """Тест: количество = 0 → должно вызвать исключение."""
+        with pytest.raises(ZeroOrderProduct) as exc_info:
+            phone = Smartphone(
+                name="Тест",
+                description="Описание",
+                price=1000,
+                quantity=0,
+                efficiency=90.0,
+                model="Модель",
+                memory=128,
+                color="Цвет"
+            )
+
+        # Проверяем сообщение исключения (опционально)
+        assert "Товар с нулевым количеством не может быть добавлен" in str(exc_info.value)
 
     def test_init_min_efficiency(self):
         """Тест: efficiency = 0.0."""
